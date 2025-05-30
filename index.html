@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>我獨自成為槍男</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>我獨自成為槍男</h1>
+
+  <button id="startGameBtn">開始遊戲</button>
+
+  <div id="mainContainer">
+    <section id="gameArea">
+      <button id="soundToggleBtn" title="切換音效狀態" aria-label="切換音效" class="sound-btn">🔊</button>
+      <div id="timer">時間：0.00 秒</div>
+      <button id="restartBtn">再玩一次</button>
+      <div id="grid"></div>
+      <h2>最快紀錄</h2>
+      <div id="bestTime">尚無紀錄</div>
+    </section>
+
+    <section id="progressArea">
+      <h2>進步幅度 <span style="font-size: 14px;">（近10次紀錄）</span></h2>
+      <div id="progressNumber">尚無資料</div>
+      <canvas id="progressChart" width="600" height="240"></canvas>
+    </section>
+  </div>
+
+  <!-- 音效 -->
+  <audio id="clickSound" src="click.mp3" preload="auto"></audio>
+  <audio id="winSound" src="win.mp3" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
