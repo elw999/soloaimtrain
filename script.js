@@ -57,7 +57,6 @@ function handleClick(btn, num) {
   btn.classList.add("clicked");
 
   if (isSoundOn) {
-    // 為了確保音效每次都能播，重置音效時間
     clickSound.pause();
     clickSound.currentTime = 0;
     clickSound.play();
@@ -68,10 +67,12 @@ function handleClick(btn, num) {
     timerRunning = false;
     const timeUsed = (Date.now() - startTime) / 1000;
     timerEl.textContent = `時間：${timeUsed.toFixed(2)} 秒`;
+
     if (best === null || timeUsed < best) {
       best = timeUsed;
       bestTimeEl.textContent = `${best.toFixed(2)} 秒`;
     }
+
     timeList.push(timeUsed);
     if (timeList.length > 10) timeList.shift();
     updateProgress();
@@ -133,7 +134,8 @@ function updateProgress() {
       responsive: true,
       scales: {
         y: {
-          beginAtZero: false
+          beginAtZero: false,
+          reverse: true // ✅ 讓進步時向上顯示
         }
       },
       plugins: {
