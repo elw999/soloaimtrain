@@ -152,3 +152,31 @@ canvas#progressChart {
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
+#credit {
+  position: fixed;
+  top: 10px;
+  right: 15px;
+  font-weight: 700;
+  color: #222;
+  user-select: none;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 6px 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  text-align: right;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+#credit > div:first-child {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+#credit .version {
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
