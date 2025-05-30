@@ -3,6 +3,7 @@ let startTime, timerInterval;
 let best = null;
 let timeList = [];
 let isSoundOn = true;
+let totalRuns = 0; // 紀錄總遊戲次數
 
 const timerEl = document.getElementById("timer");
 const bestTimeEl = document.getElementById("bestTime");
@@ -41,7 +42,7 @@ function initGame() {
   timerEl.textContent = "時間：0.00 秒";
   grid.innerHTML = "";
   timerRunning = false;
-  currentNumber = 0;  // 初始化目前已點擊數字
+  currentNumber = 0;
 
   const numbers = Array.from({ length: 25 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
   numbers.forEach((num) => {
@@ -93,6 +94,8 @@ function handleClick(btn, num) {
     timeList.push(timeUsed);
     if (timeList.length > 10) timeList.shift();
 
+    totalRuns++;  // 遊戲完成次數累加
+
     updateProgress();
 
     if (isSoundOn) {
@@ -124,7 +127,9 @@ function updateProgress() {
     progressNumber.textContent = "與上次持平";
   }
 
-  const labels = timeList.map((_, i) => `第${i + 1}次`);
+  const startRun = totalRuns - timeList.length + 1;
+  const labels = timeList.map((_, i) => `第${startRun + i}次`);
+
   if (chart) chart.destroy();
 
   chart = new Chart(ctx, {
