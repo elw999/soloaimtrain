@@ -66,6 +66,19 @@ html, body {
   border: 1px solid var(--border-color);
   width: 380px;
   margin: 0 auto;
+  cursor: pointer;
+}
+
+#startPrompt {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-color);
+  opacity: 0.8;
+  pointer-events: none;
 }
 
 /* Player Stats */
@@ -219,6 +232,7 @@ html, body {
   transition: all 0.2s ease;
   font-weight: 600;
   color: #444;
+  visibility: hidden; /* 初始隐藏数字 */
 }
 
 .grid-button:hover {
@@ -427,6 +441,12 @@ h2 {
     max-width: 500px;
     margin: 25px auto 0;
   }
+  
+  #startPrompt {
+    font-size: 16px;
+    width: 80%;
+    text-align: center;
+  }
 }
 
 @media (max-width: 768px) {
@@ -487,6 +507,10 @@ h2 {
   
   .mode-text {
     display: none;
+  }
+  
+  #startPrompt {
+    font-size: 14px;
   }
 }
 
