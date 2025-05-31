@@ -354,7 +354,6 @@ function toggleHardMode() {
 
 // 切換語言並刷新頁面
 function switchLanguage() {
-  playButtonSound();
   currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
   saveLanguagePreference();
   window.location.reload();
