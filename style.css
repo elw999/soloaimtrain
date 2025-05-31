@@ -1,3 +1,4 @@
+/* 基礎樣式 */
 html, body {
   height: 100%;
   margin: 0;
@@ -6,45 +7,93 @@ html, body {
   background: #f7f9fc;
   color: #222;
   text-align: center;
+  overflow-x: hidden;
+}
+
+/* 標題容器 */
+.title-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  height: 100vh;
+  position: relative;
+  z-index: 10;
+  transition: all 0.6s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-h1 {
-  margin: 30px 0 20px 0;
+.title-container.hide {
+  opacity: 0;
+  transform: translateY(-50px);
+  height: 0;
+  overflow: hidden;
+  margin-bottom: 0;
+  pointer-events: none;
 }
 
-#startGameBtn {
-  padding: 14px 28px;
-  font-size: 18px;
-  margin-bottom: 30px;
-  border: none;
-  border-radius: 10px;
-  background-color: #4caf50;
-  color: white;
-  cursor: pointer;
-}
-
+/* 主遊戲容器 */
+/* 主容器設置 */
 #mainContainer {
   display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 40px;
   width: 100%;
-  max-width: 700px;
+  padding: 20px 0;
 }
 
+/* 遊戲中心容器 */
+.game-center-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  max-width: 800px; /* 調整整體寬度 */
+  margin: 0 auto;
+  position: relative;
+}
+
+/* 遊戲區域 - 絕對置中 */
 #gameArea {
   position: relative;
   background: white;
-  padding: 20px 25px 30px 25px;
+  padding: 20px 25px 30px;
   border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
   user-select: none;
   width: 360px;
+  margin: 0 auto; /* 確保置中 */
 }
 
+/* 進步幅度區域 */
+#progressArea {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: 40px;
+  width: 400px;
+  background: #f4f9f4;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 12px #d2e8d2;
+}
+
+/* 響應式設計 */
+@media (max-width: 1200px) {
+  .game-center-container {
+    max-width: 360px; /* 只顯示遊戲區域 */
+  }
+  
+  #progressArea {
+    position: static;
+    width: 100%;
+    max-width: 500px;
+    margin: 40px auto 0;
+  }
+}
+
+.subtext {
+  font-size: 14px;
+  color: #666;
+}
+
+/* 計時器和記錄顯示 */
 #timer, #bestTime, #progressNumber {
   font-size: 22px;
   margin: 10px 0;
@@ -52,28 +101,73 @@ h1 {
   color: #444;
 }
 
-#restartBtn {
-  margin: 10px 10px 20px 10px;
-  padding: 12px 22px;
-  font-size: 16px;
-  border-radius: 10px;
+/* 按鈕樣式 */
+#startGameBtn, #restartBtn {
+  padding: 16px 32px;
+  font-size: 1.2rem;
   border: none;
-  cursor: pointer;
-  background-color: #4caf50;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #4CAF50, #2196F3);
   color: white;
-  transition: background-color 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin: 10px;
+  position: relative;
+  overflow: hidden;
 }
 
-#restartBtn:hover {
-  background-color: #45a049;
+#startGameBtn:hover, #restartBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
+#startGameBtn:active {
+  transform: scale(0.95) translateY(-3px);
+}
+
+#restartBtn:active {
+  transform: scale(0.95);
+}
+
+/* 漣漪動畫 */
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0) translate(-50%, -50%);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(20, 20) translate(-50%, -50%);
+    opacity: 0;
+  }
+}
+
+#startGameBtn .ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+#startGameBtn.clicked .ripple {
+  animation: ripple 0.6s ease-out;
+}
+
+/* 數字網格 */
 #grid {
   display: grid;
   grid-template-columns: repeat(5, 60px);
   grid-gap: 12px;
   justify-content: center;
-  margin-top: 15px;
+  margin: 15px auto;
 }
 
 .grid-button {
@@ -84,7 +178,7 @@ h1 {
   background-color: #fff;
   border: 2px solid #888;
   border-radius: 10px;
-  transition: background-color 0.25s, transform 0.15s;
+  transition: all 0.3s ease;
   user-select: none;
 }
 
@@ -95,31 +189,21 @@ h1 {
 .grid-button.clicked {
   background-color: #a5d6a7;
   transform: scale(1.1);
-  border-color: #4caf50;
+  border-color: #4CAF50;
   color: #2e7d32;
 }
 
-#progressArea {
-  background: #f4f9f4;
-  padding: 20px 30px;
-  border-radius: 12px;
-  box-shadow: inset 0 0 12px #d2e8d2;
-  width: 100%;
-  max-width: 700px;
-}
-
-canvas#progressChart {
-  margin-top: 15px;
+/* 圖表樣式 */
+#progressChart {
+  margin: 15px auto;
   border: 1px solid #ccc;
   border-radius: 8px;
   background: #fafafa;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 100%;
-  height: auto;
+  width: 100% !important;
+  height: 240px !important;
 }
 
+/* 音效按鈕 */
 .sound-btn {
   position: absolute;
   top: 10px;
@@ -136,22 +220,36 @@ canvas#progressChart {
   opacity: 0.7;
 }
 
-#credit {
-  position: fixed;
-  top: 10px;
-  right: 15px;
-  font-size: 20px;
+/* 標題樣式 */
+h1 {
+  font-size: 3rem;
+  color: #333;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  position: relative;
+  padding-bottom: 15px;
   font-weight: 700;
-  color: #222;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-  user-select: none;
-  z-index: 1000;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 4px 8px;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  letter-spacing: 2px;
 }
+
+h1::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background: linear-gradient(to right, #4CAF50, #2196F3);
+  border-radius: 2px;
+}
+
+h2 {
+  color: #444;
+  margin-top: 20px;
+}
+
+/* 製作人員信息 */
 #credit {
   position: fixed;
   top: 10px;
@@ -164,9 +262,7 @@ canvas#progressChart {
   padding: 6px 10px;
   border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   text-align: right;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
 }
 
 #credit > div:first-child {
@@ -178,5 +274,112 @@ canvas#progressChart {
   font-size: 14px;
   font-weight: 500;
   color: #555;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* 響應式設計 */
+@media (max-width: 900px) {
+  .game-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  #progressArea {
+    width: 100%;
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  #grid {
+    grid-template-columns: repeat(5, 40px);
+    grid-gap: 8px;
+  }
+  
+  .grid-button {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  #timer, #bestTime {
+    font-size: 18px;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+/* 玩家數據區塊樣式 */
+#playerStats {
+  position: absolute;
+  right: 100%;
+  top: 0;
+  margin-right: 40px;
+  width: 220px;
+  background: #f4f4f9;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: inset 0 0 12px #d2d2e8;
+  text-align: left;
+}
+
+.stat-item {
+  margin: 18px 0;
+  font-size: 16px;
+}
+
+.stat-label {
+  display: inline-block;
+  width: 90px;
+  color: #555;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #333;
+}
+
+.reset-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.reset-btn:hover {
+  background: #d32f2f;
+}
+
+/* 調整遊戲區域樣式 */
+#gameArea {
+  position: relative;
+  background: white;
+  padding: 20px 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  user-select: none;
+  width: 360px;
+  margin: 0 auto;
+}
+
+/* 響應式設計調整 */
+@media (max-width: 1200px) {
+  .game-center-container {
+    max-width: 360px;
+  }
+  
+  #playerStats, #progressArea {
+    position: static;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto 0;
+  }
 }

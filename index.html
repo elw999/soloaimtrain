@@ -1,47 +1,64 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>我獨自成為槍男</title>
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
-  <h1>我獨自成為槍男</h1>
-
-  <button id="startGameBtn">開始升級</button>
+  <div id="titleContainer" class="title-container">
+    <h1>我獨自成為槍男</h1>
+    <button id="startGameBtn">
+      開始升級
+      <span class="ripple"></span>
+    </button>
+  </div>
 
   <div id="mainContainer">
+  <div class="game-center-container">
+    <!-- 修改後的玩家數據區塊 -->
+    <section id="playerStats">
+      <h2>玩家數據</h2>
+      <div class="stat-item">
+        <span class="stat-label">總完成場數:</span>
+        <span id="totalGames" class="stat-value">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">平均時間:</span>
+        <span id="averageTime" class="stat-value">0.00s</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">歷史最快:</span>
+        <span id="bestTime" class="stat-value">尚無紀錄</span>
+      </div>
+      <button id="resetStatsBtn" class="reset-btn">重置數據</button>
+    </section>
+    
     <section id="gameArea">
       <button id="soundToggleBtn" title="切換音效狀態" aria-label="切換音效" class="sound-btn">🔊</button>
       <div id="timer">時間：0.00 秒</div>
       <button id="restartBtn">再玩一次</button>
       <div id="grid"></div>
-      <h2>最快紀錄</h2>
-      <div id="bestTime">尚無紀錄</div>
     </section>
-
+    
     <section id="progressArea">
-      <h2>進步幅度 <span style="font-size: 14px;">（近10次紀錄）</span></h2>
+      <h2>進步幅度 <span class="subtext">（近10次紀錄）</span></h2>
       <div id="progressNumber">尚無資料</div>
-      <canvas id="progressChart" width="600" height="240"></canvas>
+      <canvas id="progressChart" width="400" height="240"></canvas>
     </section>
   </div>
+</div>
 
   <audio id="clickSound" src="click.mp3" preload="auto"></audio>
   <audio id="winSound" src="win.mp3" preload="auto"></audio>
 
-  <script src="script.js"></script>
+  <div id="credit">
+    <div>Made by 表溜</div>
+    <div class="version">3.1 Ver.</div>
+  </div>
 
-<div id="credit">Made by 表溜</div>
-
   <script src="script.js"></script>
-<div id="credit">
-  <div>Made by 表溜</div>
-  <div class="version">2.4 Ver.</div>
-</div>
 </body>
 </html>
