@@ -7,6 +7,7 @@
   --border-color: rgba(0, 0, 0, 0.1);
 }
 
+/* Global Styles */
 html, body {
   height: 100%;
   margin: 0;
@@ -60,24 +61,70 @@ html, body {
 #gameArea {
   position: relative;
   background: white;
-  padding: 25px 30px;
+  padding: 25px 30px 70px; /* 增加底部 padding 給按鈕留空間 */
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--border-color);
   width: 380px;
   margin: 0 auto;
-  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 450px; /* 確保有足夠高度 */
 }
 
+#gameArea.game-started {
+  cursor: default;
+}
+
+#gameArea:not(.game-started) {
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Start Prompt */
 #startPrompt {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--primary-color);
-  opacity: 0.8;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  padding: 15px 30px;
+  border-radius: 50px;
+  box-shadow: 0 8px 20px rgba(58, 123, 213, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 10;
+  text-align: center;
+  width: auto;
+  white-space: nowrap;
+}
+
+#gameArea:not(.game-started) #startPrompt {
+  opacity: 1;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 8px 20px rgba(58, 123, 213, 0.4);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 12px 25px rgba(58, 123, 213, 0.6);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 8px 20px rgba(58, 123, 213, 0.4);
+  }
+}
+
+/* Hidden buttons during pre-game */
+#gameArea:not(.game-started) .grid-button {
+  opacity: 0.3;
   pointer-events: none;
 }
 
@@ -113,6 +160,7 @@ html, body {
   color: var(--text-color);
 }
 
+/* Buttons */
 .reset-btn {
   width: 100%;
   padding: 12px;
@@ -160,8 +208,8 @@ html, body {
   color: var(--text-color);
 }
 
-/* Buttons */
-#startGameBtn, #restartBtn {
+/* Start and Restart Buttons */
+#startGameBtn {
   padding: 16px 32px;
   font-size: 1.1rem;
   border: none;
@@ -176,6 +224,44 @@ html, body {
   margin: 15px 0;
   position: relative;
   overflow: hidden;
+}
+
+#restartBtn {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 15px auto 0;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(58, 123, 213, 0.3);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#gameArea.game-ended #restartBtn {
+  opacity: 1;
+  pointer-events: auto;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 #startGameBtn:hover, #restartBtn:hover {
@@ -232,7 +318,7 @@ html, body {
   transition: all 0.2s ease;
   font-weight: 600;
   color: #444;
-  visibility: hidden; /* 初始隐藏数字 */
+  visibility: hidden;
 }
 
 .grid-button:hover {
@@ -428,92 +514,6 @@ h2 {
   transform: scale(1.05);
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .game-center-container {
-    max-width: 380px;
-    flex-direction: column;
-  }
-  
-  #playerStats, #progressArea {
-    position: static;
-    width: 100%;
-    max-width: 500px;
-    margin: 25px auto 0;
-  }
-  
-  #startPrompt {
-    font-size: 16px;
-    width: 80%;
-    text-align: center;
-  }
-}
-
-@media (max-width: 768px) {
-  h1 {
-    font-size: 2.2rem;
-  }
-  
-  #gameArea {
-    width: 340px;
-    padding: 20px;
-  }
-  
-  #grid {
-    grid-template-columns: repeat(5, 50px);
-    grid-gap: 10px;
-  }
-  
-  .grid-button {
-    width: 50px;
-    height: 50px;
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.8rem;
-  }
-  
-  #gameArea {
-    width: 300px;
-    padding: 15px;
-  }
-  
-  #grid {
-    grid-template-columns: repeat(5, 45px);
-    grid-gap: 8px;
-  }
-  
-  .grid-button {
-    width: 45px;
-    height: 45px;
-    font-size: 16px;
-  }
-  
-  #timer, #bestTime {
-    font-size: 18px;
-  }
-  
-  .lang-btn {
-    padding: 6px 12px;
-    font-size: 14px;
-  }
-  
-  .coffee-btn img {
-    height: 35px;
-  }
-  
-  .mode-text {
-    display: none;
-  }
-  
-  #startPrompt {
-    font-size: 14px;
-  }
-}
-
 /* Footer Styles */
 .site-footer {
   background: white;
@@ -560,7 +560,92 @@ h2 {
   font-size: 12px;
 }
 
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .game-center-container {
+    max-width: 380px;
+    flex-direction: column;
+  }
+  
+  #playerStats, #progressArea {
+    position: static;
+    width: 100%;
+    max-width: 500px;
+    margin: 25px auto 0;
+  }
+  
+  #startPrompt {
+    font-size: 16px;
+    width: 80%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.2rem;
+  }
+  
+  #gameArea {
+    width: 340px;
+    padding: 20px 20px 70px;
+  }
+  
+  #grid {
+    grid-template-columns: repeat(5, 50px);
+    grid-gap: 10px;
+  }
+  
+  .grid-button {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+  }
+}
+
 @media (max-width: 480px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  #gameArea {
+    width: 300px;
+    padding: 15px 15px 70px;
+  }
+  
+  #grid {
+    grid-template-columns: repeat(5, 45px);
+    grid-gap: 8px;
+  }
+  
+  .grid-button {
+    width: 45px;
+    height: 45px;
+    font-size: 16px;
+  }
+  
+  #timer, #bestTime {
+    font-size: 18px;
+  }
+  
+  .lang-btn {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  .coffee-btn img {
+    height: 35px;
+  }
+  
+  .mode-text {
+    display: none;
+  }
+  
+  #startPrompt {
+    font-size: 14px;
+    padding: 10px 20px;
+  }
+  
   .site-footer {
     padding: 20px 0;
   }
@@ -569,4 +654,135 @@ h2 {
     font-size: 12px;
     margin: 0 6px;
   }
+}
+/* ===== 困难模式特效边框 ===== */
+#gameArea.hard-mode {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.1);
+}
+
+#gameArea.hard-mode::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 2px solid transparent;
+  background: linear-gradient(
+    135deg, 
+    rgba(255, 0, 0, 0.8) 0%, 
+    rgba(255, 100, 100, 0.6) 50%, 
+    rgba(255, 0, 0, 0.8) 100%
+  ) border-box;
+  border-radius: 20px;
+  mask: 
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(#fff, #fff);
+  mask-composite: exclude;
+  z-index: 1;
+  pointer-events: none;
+  animation: borderGlow 2s linear infinite;
+}
+
+@keyframes borderGlow {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+/* ===== 修正后的困难模式特效边框 ===== */
+#gameArea.hard-mode {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+  z-index: 1;
+}
+
+#gameArea.hard-mode::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 2px solid;
+  border-image: linear-gradient(
+    135deg,
+    #ff0000,
+    #ff5252,
+    #ff0000
+  ) 1;
+  border-radius: 19px; /* 比容器大1px */
+  z-index: -1;
+  pointer-events: none;
+  animation: borderPulse 2s ease infinite;
+}
+
+@keyframes borderPulse {
+  0% {
+    opacity: 0.8;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(255, 82, 82, 0.6);
+  }
+  100% {
+    opacity: 0.8;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+  }
+}
+
+/* 确保边框显示在最上层 */
+#gameArea.hard-mode {
+  isolation: isolate;
+}
+
+
+/* ===== 简洁版开始游戏提示 ===== */
+#startPrompt {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(58, 123, 213, 0.9); /* 半透明蓝色背景 */
+  padding: 12px 24px;
+  border-radius: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 10;
+  text-align: center;
+  width: auto;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#gameArea:not(.game-started) #startPrompt {
+  opacity: 1;
+  animation: subtlePulse 2s ease-in-out infinite;
+}
+
+@keyframes subtlePulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.02);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* 游戏区域悬停效果 */
+#gameArea:not(.game-started):hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+#gameArea:not(.game-started):hover #startPrompt {
+  background: rgba(58, 123, 213, 1); /* 悬停时稍微加深颜色 */
 }

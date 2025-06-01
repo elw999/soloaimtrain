@@ -1,4 +1,4 @@
-// 遊戲狀態變量
+// Game state variables
 let currentNumber = 0;
 let startTime, timerInterval;
 let best = null;
@@ -8,7 +8,7 @@ let totalRuns = 0;
 let isHardMode = false;
 let isGameStarted = false;
 
-// 語言翻譯對象
+// Language translations
 const translations = {
   'zh': {
     'gameTitle': '我獨自成為槍男',
@@ -32,7 +32,7 @@ const translations = {
     'madeBy': 'Made by 表溜',
     'normalMode': '普通模式',
     'hardMode': '困難模式',
-    'startPrompt': '按空格鍵開始'
+    'startPrompt': '點擊空白處開始遊戲'
   },
   'en': {
     'gameTitle': 'Solo Aim Train',
@@ -56,13 +56,13 @@ const translations = {
     'madeBy': 'Made by 表溜',
     'normalMode': 'Normal Mode',
     'hardMode': 'Hard Mode',
-    'startPrompt': 'Press Space to start'
+    'startPrompt': 'Click to start game'
   }
 };
 
-let currentLanguage = 'zh'; // 默認中文
+let currentLanguage = 'zh';
 
-// DOM 元素
+// DOM elements
 const timerEl = document.getElementById("timer");
 const bestTimeEl = document.getElementById("bestTime");
 const grid = document.getElementById("grid");
@@ -86,15 +86,15 @@ const gameArea = document.getElementById("gameArea");
 const startPrompt = document.getElementById("startPrompt");
 const coffeeBtn = document.querySelector(".coffee-btn");
 
-// 玩家數據元素
+// Player stats elements
 const totalGamesEl = document.getElementById("totalGames");
 const averageTimeEl = document.getElementById("averageTime");
 
-// 圖表變量
+// Chart variables
 let chart;
 let timerRunning = false;
 
-// 播放按鈕音效
+// Play button sound
 function playButtonSound() {
   if (isSoundOn) {
     buttonSound.currentTime = 0;
@@ -102,7 +102,7 @@ function playButtonSound() {
   }
 }
 
-// 從localStorage加載數據
+// Load stats from localStorage
 function loadStats() {
   const savedStats = localStorage.getItem('gunmanGameStats');
   if (savedStats) {
@@ -112,37 +112,34 @@ function loadStats() {
     timeList = stats.timeList || [];
     isHardMode = stats.isHardMode || false;
     
-    if (best !== null) {
+    // 初始化困难模式样式
+    if (isHardMode) {
+      if (gameArea) gameArea.classList.add("hard-mode");
+      if (hardModeBtn) hardModeBtn.classList.add("hard");
+      if (modeText) modeText.textContent = translations[currentLanguage].hardMode;
+      if (modeIcon) modeIcon.textContent = '💀';
+    }
+
+    if (best !== null && bestTimeEl) {
       bestTimeEl.textContent = currentLanguage === 'zh' ? 
         `${best.toFixed(2)} 秒` : 
         `${best.toFixed(2)}s`;
     }
-    
-    // 更新困難模式按鈕狀態
-    if (isHardMode) {
-      hardModeBtn.classList.add("hard");
-      modeText.textContent = translations[currentLanguage].hardMode;
-      modeIcon.textContent = '💀';
-    } else {
-      hardModeBtn.classList.remove("hard");
-      modeText.textContent = translations[currentLanguage].normalMode;
-      modeIcon.textContent = '😊';
-    }
   }
 }
 
-// 保存數據到localStorage
+// Save stats to localStorage
 function saveStats() {
   const stats = {
     totalRuns,
     best,
     timeList,
-    isHardMode
+    isHardMode  // 确保这行存在
   };
   localStorage.setItem('gunmanGameStats', JSON.stringify(stats));
 }
 
-// 重置所有統計數據
+// Reset all stats
 function resetStats() {
   playButtonSound();
   if (confirm(translations[currentLanguage].confirmReset)) {
@@ -157,7 +154,7 @@ function resetStats() {
   }
 }
 
-// 初始化遊戲
+// Initialize game
 function initGame() {
   clearInterval(timerInterval);
   timerEl.textContent = translations[currentLanguage].timer;
@@ -166,49 +163,48 @@ function initGame() {
   currentNumber = 0;
   isGameStarted = false;
   startPrompt.style.display = "block";
-
-  // 生成隨機數字網格
+  gameArea.classList.remove("game-started");
+  gameArea.classList.remove("game-ended");
+  
   const numbers = Array.from({ length: 25 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
   numbers.forEach((num) => {
     const btn = document.createElement("button");
     btn.classList.add("grid-button");
     btn.textContent = num;
     btn.dataset.num = num;
-    btn.style.visibility = "hidden"; // 初始隱藏數字
+    btn.style.visibility = "hidden";
     btn.addEventListener("click", () => handleClick(btn, num));
     grid.appendChild(btn);
   });
 }
 
-// 開始遊戲
+// Start game
 function startGame() {
   if (!isGameStarted && grid.innerHTML !== "") {
     isGameStarted = true;
     startPrompt.style.display = "none";
+    gameArea.classList.add("game-started");
     
-    // 顯示所有數字
     const buttons = document.querySelectorAll(".grid-button");
     buttons.forEach(btn => {
       btn.style.visibility = "visible";
     });
     
-    // 開始計時
     startTime = Date.now();
     timerInterval = setInterval(updateTimer, 10);
     timerRunning = true;
   }
 }
 
-// 處理數字點擊
+// Handle number click
 function handleClick(btn, num) {
-  if (!isGameStarted) return; // 遊戲未開始時不能點擊
+  if (!isGameStarted) return;
   
   const expected = currentNumber + 1;
   if (num !== expected) return;
 
   currentNumber = expected;
   
-  // 只有在非困難模式下才添加視覺反饋
   if (!isHardMode) {
     btn.classList.add("clicked");
     setTimeout(() => {
@@ -216,7 +212,6 @@ function handleClick(btn, num) {
     }, 2000);
   }
 
-  // 播放音效
   if (isSoundOn) {
     clickSound.pause();
     clickSound.currentTime = 0;
@@ -227,12 +222,12 @@ function handleClick(btn, num) {
     clearInterval(timerInterval);
     timerRunning = false;
     isGameStarted = false;
+    gameArea.classList.add("game-ended");
     const timeUsed = (Date.now() - startTime) / 1000;
     timerEl.textContent = currentLanguage === 'zh' ? 
       `時間：${timeUsed.toFixed(2)} 秒` : 
       `Time: ${timeUsed.toFixed(2)}s`;
 
-    // 更新最佳紀錄
     if (best === null || timeUsed < best) {
       best = timeUsed;
       bestTimeEl.textContent = currentLanguage === 'zh' ? 
@@ -240,19 +235,15 @@ function handleClick(btn, num) {
         `${best.toFixed(2)}s`;
     }
 
-    // 更新時間列表
     timeList.push(timeUsed);
     if (timeList.length > 10) timeList.shift();
     
-    // 更新遊戲次數
     totalRuns++;
     
-    // 更新玩家數據和進度圖表
     updatePlayerStats();
     updateProgress();
     saveStats();
 
-    // 播放勝利音效
     if (isSoundOn) {
       winSound.pause();
       winSound.currentTime = 0;
@@ -261,7 +252,7 @@ function handleClick(btn, num) {
   }
 }
 
-// 更新計時器顯示
+// Update timer display
 function updateTimer() {
   const elapsed = (Date.now() - startTime) / 1000;
   timerEl.textContent = currentLanguage === 'zh' ? 
@@ -269,18 +260,17 @@ function updateTimer() {
     `Time: ${elapsed.toFixed(2)}s`;
 }
 
-// 更新玩家數據
+// Update player stats
 function updatePlayerStats() {
   totalGamesEl.textContent = totalRuns;
   
-  // 計算平均時間
   const avg = timeList.length > 0 
     ? (timeList.reduce((a, b) => a + b, 0) / timeList.length)
     : 0;
   averageTimeEl.textContent = avg.toFixed(2) + (currentLanguage === 'zh' ? 's' : 's');
 }
 
-// 更新進度圖表
+// Update progress chart
 function updateProgress() {
   if (timeList.length < 2) {
     progressNumber.textContent = translations[currentLanguage].noData;
@@ -297,7 +287,6 @@ function updateProgress() {
     progressNumber.textContent = translations[currentLanguage].same;
   }
 
-  // 準備圖表數據
   const startRun = totalRuns - timeList.length + 1;
   const runText = currentLanguage === 'zh' ? '第' : 'Run ';
   const labels = timeList.map((_, i) => `${runText}${startRun + i}${currentLanguage === 'zh' ? '次' : ''}`);
@@ -332,39 +321,40 @@ function updateProgress() {
   });
 }
 
-// 切換困難模式
+// Toggle hard mode
 function toggleHardMode() {
   playButtonSound();
   isHardMode = !isHardMode;
   
   if (isHardMode) {
-    hardModeBtn.classList.add("hard");
-    modeText.textContent = translations[currentLanguage].hardMode;
-    modeIcon.textContent = '💀';
+    if (hardModeBtn) hardModeBtn.classList.add("hard");
+    if (gameArea) gameArea.classList.add("hard-mode");
+    if (modeText) modeText.textContent = translations[currentLanguage].hardMode;
+    if (modeIcon) modeIcon.textContent = '💀';
   } else {
-    hardModeBtn.classList.remove("hard");
-    modeText.textContent = translations[currentLanguage].normalMode;
-    modeIcon.textContent = '😊';
+    if (hardModeBtn) hardModeBtn.classList.remove("hard");
+    if (gameArea) gameArea.classList.remove("hard-mode");
+    if (modeText) modeText.textContent = translations[currentLanguage].normalMode;
+    if (modeIcon) modeIcon.textContent = '😊';
   }
   
-  // 重新初始化遊戲以應用新模式
   initGame();
   saveStats();
 }
 
-// 切換語言並刷新頁面
+// Switch language
 function switchLanguage() {
   currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
   saveLanguagePreference();
   window.location.reload();
 }
 
-// 保存語言偏好到localStorage
+// Save language preference
 function saveLanguagePreference() {
   localStorage.setItem('gunmanGameLanguage', currentLanguage);
 }
 
-// 從localStorage加載語言偏好
+// Load language preference
 function loadLanguagePreference() {
   const savedLanguage = localStorage.getItem('gunmanGameLanguage');
   if (savedLanguage) {
@@ -374,14 +364,13 @@ function loadLanguagePreference() {
   updateLanguageButton();
 }
 
-// 更新語言按鈕文本
+// Update language button text
 function updateLanguageButton() {
   langTextEl.textContent = currentLanguage === 'zh' ? 'EN' : '中文';
 }
 
-// 翻譯頁面
+// Translate page
 function translatePage() {
-  // 標題和按鈕
   document.querySelector('h1').textContent = translations[currentLanguage].gameTitle;
   document.getElementById('startGameBtn').innerHTML = `
     ${translations[currentLanguage].startButton}
@@ -389,20 +378,17 @@ function translatePage() {
   `;
   document.getElementById('restartBtn').textContent = translations[currentLanguage].restartButton;
   
-  // 玩家數據區域
   document.querySelector('#playerStats h2').textContent = translations[currentLanguage].playerStats;
   document.querySelectorAll('.stat-item')[0].querySelector('.stat-label').textContent = translations[currentLanguage].totalGames;
   document.querySelectorAll('.stat-item')[1].querySelector('.stat-label').textContent = translations[currentLanguage].averageTime;
   document.querySelectorAll('.stat-item')[2].querySelector('.stat-label').textContent = translations[currentLanguage].bestTime;
   document.getElementById('resetStatsBtn').textContent = translations[currentLanguage].resetButton;
   
-  // 進步幅度區域
   document.querySelector('#progressArea h2').innerHTML = `
     ${translations[currentLanguage].progressTitle} 
     <span class="subtext">${translations[currentLanguage].progressSubtext}</span>
   `;
   
-  // 更新計時器顯示
   if (timerEl) {
     const timeText = timerEl.textContent.match(/\d+\.\d+/);
     if (timeText) {
@@ -414,7 +400,6 @@ function translatePage() {
     }
   }
   
-  // 更新最佳紀錄
   if (bestTimeEl) {
     if (best !== null) {
       bestTimeEl.textContent = currentLanguage === 'zh' ? 
@@ -425,32 +410,27 @@ function translatePage() {
     }
   }
   
-  // 更新困難模式按鈕文本
   if (modeText) {
     modeText.textContent = isHardMode ? 
       translations[currentLanguage].hardMode : 
       translations[currentLanguage].normalMode;
   }
   
-  // 更新開始提示文本
   if (startPrompt) {
     startPrompt.textContent = translations[currentLanguage].startPrompt;
   }
   
-  // 更新製作人員信息
   document.querySelector('#credit > div:first-child').textContent = translations[currentLanguage].madeBy;
 }
 
-// 事件監聽器
+// Event listeners
 startGameBtn.addEventListener("click", function() {
   playButtonSound();
-  // 觸發漣漪動畫
   const ripple = this.querySelector(".ripple");
   ripple.style.animation = "none";
-  void ripple.offsetWidth; // 觸發重繪
+  void ripple.offsetWidth;
   ripple.style.animation = "ripple 0.6s ease-out";
   
-  // 隱藏標題，顯示遊戲
   titleContainer.classList.add("hide");
   setTimeout(() => {
     mainContainer.style.display = "flex";
@@ -463,15 +443,9 @@ startGameBtn.addEventListener("click", function() {
   }, 300);
 });
 
-restartBtn.addEventListener("click", () => {
+restartBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
   playButtonSound();
-  // 按鈕反饋動畫
-  restartBtn.style.transform = "scale(0.95)";
-  setTimeout(() => {
-    restartBtn.style.transform = "scale(1)";
-  }, 200);
-  
-  // 重新開始遊戲
   initGame();
 });
 
@@ -489,30 +463,33 @@ switchLanguageBtn.addEventListener("click", switchLanguage);
 
 hardModeBtn.addEventListener("click", toggleHardMode);
 
-// 為Buy Me a Coffee按鈕添加音效
 coffeeBtn.addEventListener('click', function() {
   playButtonSound();
-  // 允許默認行為繼續執行（打開鏈接）
 });
 
-// 遊戲區域點擊開始
+// Game area click handler
 gameArea.addEventListener("click", function(e) {
-  if (e.target === this && !isGameStarted && grid.innerHTML !== "") {
+  const allButtonsHidden = document.querySelectorAll('.grid-button[style*="visible"]').length === 0;
+  
+  if (!isGameStarted && grid.innerHTML !== "" && !e.target.closest('button') && allButtonsHidden) {
     playButtonSound();
     startGame();
   }
 });
 
-// 空格鍵開始
+// Space key to start
 document.addEventListener("keydown", function(e) {
   if (e.code === "Space" && !isGameStarted && grid.innerHTML !== "") {
-    e.preventDefault();
-    playButtonSound();
-    startGame();
+    const allButtonsHidden = document.querySelectorAll('.grid-button[style*="visible"]').length === 0;
+    if (allButtonsHidden) {
+      e.preventDefault();
+      playButtonSound();
+      startGame();
+    }
   }
 });
 
-// 初始化遊戲和數據
+// Initialize game and data
 loadLanguagePreference();
 loadStats();
 updatePlayerStats();
