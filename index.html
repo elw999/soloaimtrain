@@ -28,18 +28,41 @@
     <div class="game-center-container">
       <section id="playerStats">
         <h2>玩家數據</h2>
-        <div class="stat-item">
-          <span class="stat-label">總完成場數:</span>
-          <span id="totalGames" class="stat-value">0</span>
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="normal">普通模式</button>
+          <button class="mode-tab" data-mode="hard">困難模式</button>
         </div>
-        <div class="stat-item">
-          <span class="stat-label">平均時間:</span>
-          <span id="averageTime" class="stat-value">0.00s</span>
+        
+        <div id="normalStats" class="stats-container active">
+          <div class="stat-item">
+            <span class="stat-label">總完成場數:</span>
+            <span id="normalTotalGames" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">平均時間:</span>
+            <span id="normalAverageTime" class="stat-value">0.00s</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">歷史最快:</span>
+            <span id="normalBestTime" class="stat-value">尚無紀錄</span>
+          </div>
         </div>
-        <div class="stat-item">
-          <span class="stat-label">歷史最快:</span>
-          <span id="bestTime" class="stat-value">尚無紀錄</span>
+        
+        <div id="hardStats" class="stats-container">
+          <div class="stat-item">
+            <span class="stat-label">總完成場數:</span>
+            <span id="hardTotalGames" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">平均時間:</span>
+            <span id="hardAverageTime" class="stat-value">0.00s</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">歷史最快:</span>
+            <span id="hardBestTime" class="stat-value">尚無紀錄</span>
+          </div>
         </div>
+        
         <button id="resetStatsBtn" class="reset-btn">重置數據</button>
         <a href="https://buymeacoffee.com/elwfk" target="_blank" class="coffee-btn">
           <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
@@ -53,10 +76,10 @@
         </button>
         <button id="soundToggleBtn" title="切換音效狀態" aria-label="切換音效" class="sound-btn">🔊</button>
         <div id="timer">時間：0.00 秒</div>
-      <div id="grid"></div>
-  <div id="startPrompt">點擊空白處開始遊戲</div>
+        <div id="grid"></div>
+        <div id="startPrompt">點擊空白處開始遊戲</div>
         <button id="restartBtn">再玩一次</button>
-</section>
+      </section>
       
       <section id="progressArea">
         <h2>進步幅度 <span class="subtext">（近10次紀錄）</span></h2>
@@ -72,21 +95,21 @@
 
   <div id="credit">
     <div>Made by 表溜</div>
-    <div class="version">3.1.8 Ver.</div>
+    <div class="version">3.2 Ver.</div>
   </div>
 
   <script src="script.js"></script>
-<footer class="site-footer">
-  <div class="footer-content">
-    <p>© 2025 我獨自成為槍男 - 反應力訓練</p>
-    <div class="footer-links">
-      <a href="#" class="footer-link">表溜嘎帥</a>
-      <span class="divider">|</span>
-      <a href="#" class="footer-link">表溜愛你</a>
-      <span class="divider">|</span>
-      <a href="#" class="footer-link">我要喝咖啡</a>
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>© 2025 我獨自成為槍男 - 反應力訓練</p>
+      <div class="footer-links">
+        <a href="#" class="footer-link">表溜嘎帥</a>
+        <span class="divider">|</span>
+        <a href="#" class="footer-link">表溜愛你</a>
+        <span class="divider">|</span>
+        <a href="#" class="footer-link">我要喝咖啡</a>
+      </div>
     </div>
-  </div>
-</footer>
+  </footer>
 </body>
 </html>

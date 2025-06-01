@@ -1,12 +1,22 @@
 // Game state variables
 let currentNumber = 0;
 let startTime, timerInterval;
-let best = null;
-let timeList = [];
 let isSoundOn = true;
-let totalRuns = 0;
 let isHardMode = false;
 let isGameStarted = false;
+
+// Separate stats for normal and hard modes
+let normalBest = null;
+let normalTimeList = [];
+let normalTotalRuns = 0;
+let hardBest = null;
+let hardTimeList = [];
+let hardTotalRuns = 0;
+
+// Current active stats (for display)
+let currentBest = null;
+let currentTimeList = [];
+let currentTotalRuns = 0;
 
 // Language translations
 const translations = {
@@ -15,7 +25,7 @@ const translations = {
     'startButton': '開始升級',
     'timer': '時間：0.00 秒',
     'restartButton': '再玩一次',
-    'bestTime': '歷史最快',
+    'bestTime': '歷史最快:',
     'noRecord': '尚無紀錄',
     'playerStats': '玩家數據',
     'totalGames': '總完成場數:',
@@ -64,7 +74,6 @@ let currentLanguage = 'zh';
 
 // DOM elements
 const timerEl = document.getElementById("timer");
-const bestTimeEl = document.getElementById("bestTime");
 const grid = document.getElementById("grid");
 const restartBtn = document.getElementById("restartBtn");
 const soundBtn = document.getElementById("soundToggleBtn");
@@ -86,9 +95,18 @@ const gameArea = document.getElementById("gameArea");
 const startPrompt = document.getElementById("startPrompt");
 const coffeeBtn = document.querySelector(".coffee-btn");
 
-// Player stats elements
-const totalGamesEl = document.getElementById("totalGames");
-const averageTimeEl = document.getElementById("averageTime");
+// Player stats elements for normal mode
+const normalTotalGamesEl = document.getElementById("normalTotalGames");
+const normalAverageTimeEl = document.getElementById("normalAverageTime");
+const normalBestTimeEl = document.getElementById("normalBestTime");
+
+// Player stats elements for hard mode
+const hardTotalGamesEl = document.getElementById("hardTotalGames");
+const hardAverageTimeEl = document.getElementById("hardAverageTime");
+const hardBestTimeEl = document.getElementById("hardBestTime");
+
+// Mode tabs
+const modeTabs = document.querySelectorAll(".mode-tab");
 
 // Chart variables
 let chart;
@@ -107,12 +125,14 @@ function loadStats() {
   const savedStats = localStorage.getItem('gunmanGameStats');
   if (savedStats) {
     const stats = JSON.parse(savedStats);
-    totalRuns = stats.totalRuns || 0;
-    best = stats.best || null;
-    timeList = stats.timeList || [];
+    normalTotalRuns = stats.normalTotalRuns || 0;
+    normalBest = stats.normalBest || null;
+    normalTimeList = stats.normalTimeList || [];
+    hardTotalRuns = stats.hardTotalRuns || 0;
+    hardBest = stats.hardBest || null;
+    hardTimeList = stats.hardTimeList || [];
     isHardMode = stats.isHardMode || false;
     
-    // 初始化困难模式样式
     if (isHardMode) {
       if (gameArea) gameArea.classList.add("hard-mode");
       if (hardModeBtn) hardModeBtn.classList.add("hard");
@@ -120,37 +140,35 @@ function loadStats() {
       if (modeIcon) modeIcon.textContent = '💀';
     }
 
-    if (best !== null && bestTimeEl) {
-      bestTimeEl.textContent = currentLanguage === 'zh' ? 
-        `${best.toFixed(2)} 秒` : 
-        `${best.toFixed(2)}s`;
-    }
+    updateCurrentStats();
+    updatePlayerStats();
   }
 }
 
 // Save stats to localStorage
 function saveStats() {
   const stats = {
-    totalRuns,
-    best,
-    timeList,
-    isHardMode  // 确保这行存在
+    normalTotalRuns,
+    normalBest,
+    normalTimeList,
+    hardTotalRuns,
+    hardBest,
+    hardTimeList,
+    isHardMode
   };
   localStorage.setItem('gunmanGameStats', JSON.stringify(stats));
 }
 
-// Reset all stats
-function resetStats() {
-  playButtonSound();
-  if (confirm(translations[currentLanguage].confirmReset)) {
-    totalRuns = 0;
-    best = null;
-    timeList = [];
-    
-    bestTimeEl.textContent = translations[currentLanguage].noRecord;
-    saveStats();
-    updatePlayerStats();
-    updateProgress();
+// Update current stats based on mode
+function updateCurrentStats() {
+  if (isHardMode) {
+    currentBest = hardBest;
+    currentTimeList = hardTimeList;
+    currentTotalRuns = hardTotalRuns;
+  } else {
+    currentBest = normalBest;
+    currentTimeList = normalTimeList;
+    currentTotalRuns = normalTotalRuns;
   }
 }
 
@@ -228,18 +246,24 @@ function handleClick(btn, num) {
       `時間：${timeUsed.toFixed(2)} 秒` : 
       `Time: ${timeUsed.toFixed(2)}s`;
 
-    if (best === null || timeUsed < best) {
-      best = timeUsed;
-      bestTimeEl.textContent = currentLanguage === 'zh' ? 
-        `${best.toFixed(2)} 秒` : 
-        `${best.toFixed(2)}s`;
+    // Update stats based on current mode
+    if (isHardMode) {
+      if (hardBest === null || timeUsed < hardBest) {
+        hardBest = timeUsed;
+      }
+      hardTimeList.push(timeUsed);
+      if (hardTimeList.length > 10) hardTimeList.shift();
+      hardTotalRuns++;
+    } else {
+      if (normalBest === null || timeUsed < normalBest) {
+        normalBest = timeUsed;
+      }
+      normalTimeList.push(timeUsed);
+      if (normalTimeList.length > 10) normalTimeList.shift();
+      normalTotalRuns++;
     }
-
-    timeList.push(timeUsed);
-    if (timeList.length > 10) timeList.shift();
     
-    totalRuns++;
-    
+    updateCurrentStats();
     updatePlayerStats();
     updateProgress();
     saveStats();
@@ -262,23 +286,36 @@ function updateTimer() {
 
 // Update player stats
 function updatePlayerStats() {
-  totalGamesEl.textContent = totalRuns;
-  
-  const avg = timeList.length > 0 
-    ? (timeList.reduce((a, b) => a + b, 0) / timeList.length)
+  // Update normal mode stats
+  normalTotalGamesEl.textContent = normalTotalRuns;
+  const normalAvg = normalTimeList.length > 0 
+    ? (normalTimeList.reduce((a, b) => a + b, 0) / normalTimeList.length)
     : 0;
-  averageTimeEl.textContent = avg.toFixed(2) + (currentLanguage === 'zh' ? 's' : 's');
+  normalAverageTimeEl.textContent = normalAvg.toFixed(2) + 's';
+  normalBestTimeEl.textContent = normalBest === null 
+    ? translations[currentLanguage].noRecord 
+    : normalBest.toFixed(2) + 's';
+
+  // Update hard mode stats
+  hardTotalGamesEl.textContent = hardTotalRuns;
+  const hardAvg = hardTimeList.length > 0 
+    ? (hardTimeList.reduce((a, b) => a + b, 0) / hardTimeList.length)
+    : 0;
+  hardAverageTimeEl.textContent = hardAvg.toFixed(2) + 's';
+  hardBestTimeEl.textContent = hardBest === null 
+    ? translations[currentLanguage].noRecord 
+    : hardBest.toFixed(2) + 's';
 }
 
 // Update progress chart
 function updateProgress() {
-  if (timeList.length < 2) {
+  if (currentTimeList.length < 2) {
     progressNumber.textContent = translations[currentLanguage].noData;
     if (chart) chart.destroy();
     return;
   }
 
-  const diff = timeList[timeList.length - 2] - timeList[timeList.length - 1];
+  const diff = currentTimeList[currentTimeList.length - 2] - currentTimeList[currentTimeList.length - 1];
   if (diff > 0) {
     progressNumber.textContent = translations[currentLanguage].improved.replace('${diff}', diff.toFixed(3));
   } else if (diff < 0) {
@@ -287,9 +324,9 @@ function updateProgress() {
     progressNumber.textContent = translations[currentLanguage].same;
   }
 
-  const startRun = totalRuns - timeList.length + 1;
+  const startRun = currentTotalRuns - currentTimeList.length + 1;
   const runText = currentLanguage === 'zh' ? '第' : 'Run ';
-  const labels = timeList.map((_, i) => `${runText}${startRun + i}${currentLanguage === 'zh' ? '次' : ''}`);
+  const labels = currentTimeList.map((_, i) => `${runText}${startRun + i}${currentLanguage === 'zh' ? '次' : ''}`);
 
   if (chart) chart.destroy();
 
@@ -299,7 +336,7 @@ function updateProgress() {
       labels: labels,
       datasets: [{
         label: translations[currentLanguage].timeLabel,
-        data: timeList,
+        data: currentTimeList,
         borderColor: "#4caf50",
         backgroundColor: "rgba(76,175,80,0.2)",
         fill: true,
@@ -338,8 +375,28 @@ function toggleHardMode() {
     if (modeIcon) modeIcon.textContent = '😊';
   }
   
+  updateCurrentStats();
   initGame();
+  updatePlayerStats();
+  updateProgress();
   saveStats();
+}
+
+// Reset stats
+function resetStats() {
+  if (confirm(translations[currentLanguage].confirmReset)) {
+    normalBest = null;
+    normalTimeList = [];
+    normalTotalRuns = 0;
+    hardBest = null;
+    hardTimeList = [];
+    hardTotalRuns = 0;
+    
+    updateCurrentStats();
+    updatePlayerStats();
+    updateProgress();
+    saveStats();
+  }
 }
 
 // Switch language
@@ -379,9 +436,9 @@ function translatePage() {
   document.getElementById('restartBtn').textContent = translations[currentLanguage].restartButton;
   
   document.querySelector('#playerStats h2').textContent = translations[currentLanguage].playerStats;
-  document.querySelectorAll('.stat-item')[0].querySelector('.stat-label').textContent = translations[currentLanguage].totalGames;
-  document.querySelectorAll('.stat-item')[1].querySelector('.stat-label').textContent = translations[currentLanguage].averageTime;
-  document.querySelectorAll('.stat-item')[2].querySelector('.stat-label').textContent = translations[currentLanguage].bestTime;
+  document.querySelectorAll('.stat-item .stat-label')[0].textContent = translations[currentLanguage].totalGames;
+  document.querySelectorAll('.stat-item .stat-label')[1].textContent = translations[currentLanguage].averageTime;
+  document.querySelectorAll('.stat-item .stat-label')[2].textContent = translations[currentLanguage].bestTime;
   document.getElementById('resetStatsBtn').textContent = translations[currentLanguage].resetButton;
   
   document.querySelector('#progressArea h2').innerHTML = `
@@ -400,14 +457,16 @@ function translatePage() {
     }
   }
   
-  if (bestTimeEl) {
-    if (best !== null) {
-      bestTimeEl.textContent = currentLanguage === 'zh' ? 
-        `${best.toFixed(2)} 秒` : 
-        `${best.toFixed(2)}s`;
-    } else {
-      bestTimeEl.textContent = translations[currentLanguage].noRecord;
-    }
+  if (normalBestTimeEl) {
+    normalBestTimeEl.textContent = normalBest === null 
+      ? translations[currentLanguage].noRecord 
+      : normalBest.toFixed(2) + 's';
+  }
+  
+  if (hardBestTimeEl) {
+    hardBestTimeEl.textContent = hardBest === null 
+      ? translations[currentLanguage].noRecord 
+      : hardBest.toFixed(2) + 's';
   }
   
   if (modeText) {
@@ -421,6 +480,12 @@ function translatePage() {
   }
   
   document.querySelector('#credit > div:first-child').textContent = translations[currentLanguage].madeBy;
+  
+  // Update mode tabs
+  modeTabs.forEach(tab => {
+    const mode = tab.dataset.mode;
+    tab.textContent = translations[currentLanguage][`${mode}Mode`];
+  });
 }
 
 // Event listeners
@@ -487,6 +552,21 @@ document.addEventListener("keydown", function(e) {
       startGame();
     }
   }
+});
+
+// Mode tab switching
+modeTabs.forEach(tab => {
+  tab.addEventListener('click', function() {
+    modeTabs.forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    
+    const mode = this.dataset.mode;
+    document.querySelectorAll('.stats-container').forEach(container => {
+      container.classList.remove('active');
+    });
+    
+    document.getElementById(`${mode}Stats`).classList.add('active');
+  });
 });
 
 // Initialize game and data
