@@ -3,16 +3,79 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>我獨自成為槍男</title>
+  <title>我獨自成為槍男| 舒爾特方塊</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  
+  <style>
+    /* 修复网格大小选项颜色问题 */
+    #gridSize option {
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+    }
+    
+    /* 修复成就面板高度问题 */
+    .achievements-panel {
+      max-height: none;
+      overflow: visible;
+    }
+    
+    <!-- 修改 #startPrompt 部分 -->
+<div id="startPrompt">
+  <div class="click-hint">
+    <div class="mouse-icon">
+      <div class="mouse-wheel"></div>
+    </div>
+    <div class="click-text">點擊空白處開始</div>
+  </div>
+</div>
+    
+    #gameArea:not(.game-started) #startPrompt {
+      opacity: 1;
+    }
+    
+    /* 顶部控制按钮布局修复 */
+    .top-controls {
+      display: flex;
+      gap: 15px;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+    }
+    
+    @media (max-width: 480px) {
+      .top-controls {
+        gap: 10px;
+        top: 10px;
+        left: 10px;
+      }
+      
+      .achievement-btn .achievement-text {
+        display: none;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div id="languageSwitcher">
-    <button id="switchLanguageBtn" class="lang-btn">
-      <span class="lang-flag">🌐</span>
-      <span class="lang-text">EN</span>
+  <!-- 粒子背景容器 -->
+  <div id="particles-js"></div>
+  
+  <!-- 顶部控制按钮容器 -->
+  <div class="top-controls">
+    <div id="languageSwitcher">
+      <button id="switchLanguageBtn" class="lang-btn">
+        <span class="lang-flag">🌐</span>
+        <span class="lang-text">EN</span>
+      </button>
+    </div>
+
+    <button id="achievementBtn" class="achievement-btn">
+      <span class="achievement-icon">🏆</span>
+      <span class="achievement-text">成就</span>
+      <span id="newAchievementBadge" class="new-badge">!</span>
     </button>
   </div>
 
@@ -64,9 +127,44 @@
         </div>
         
         <button id="resetStatsBtn" class="reset-btn">重置數據</button>
-        <a href="https://buymeacoffee.com/elwfk" target="_blank" class="coffee-btn">
-          <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
-        </a>
+
+       <!-- 成就模態框 -->
+<div id="achievementModal" class="achievement-modal">
+  <div class="modal-overlay"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>成就系統</h2>
+      <button id="closeModalBtn" class="close-btn">&times;</button>
+    </div>
+    <div id="achievementsList" class="achievements-container">
+      <!-- 成就会动态添加 -->
+    </div>
+  </div>
+</div>
+        
+        <!-- 设置面板 -->
+<div class="settings-panel">
+  <div class="settings-header">
+    <div class="settings-title">遊戲設置</div>
+  </div>
+  <div class="settings-group">
+    <label class="settings-label">網格大小:</label>
+    <select id="gridSize" class="settings-input">
+      <option value="5">5x5 (25個數字)</option>
+      <option value="6">6x6 (36個數字)</option>
+      <option value="7">7x7 (49個數字)</option>
+    </select>
+  </div>
+  <button id="applySettingsBtn" class="reset-btn">應用設置</button>
+</div>
+        
+        <!-- 成就面板 -->
+        <div class="achievements-panel">
+          <h2></h2>
+          <div id="achievementsList">
+            <!-- 成就会动态添加 -->
+          </div>
+        </div>
       </section>
       
       <section id="gameArea">
@@ -74,9 +172,14 @@
           <span class="mode-icon">😊</span>
           <span class="mode-text">普通模式</span>
         </button>
-        <button id="soundToggleBtn" title="切換音效狀態" aria-label="切換音效" class="sound-btn">🔊</button>
+        <div id="soundControls">
+          <button id="soundToggleBtn" title="切換音效狀態" aria-label="切換音效" class="sound-btn">🔊</button>
+          <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+        </div>
         <div id="timer">時間：0.00 秒</div>
-        <div id="grid"></div>
+        <div id="grid-container">
+          <div id="grid"></div>
+        </div>
         <div id="startPrompt">點擊空白處開始遊戲</div>
         <button id="restartBtn">再玩一次</button>
       </section>
@@ -85,31 +188,56 @@
         <h2>進步幅度 <span class="subtext">（近10次紀錄）</span></h2>
         <div id="progressNumber">尚無資料</div>
         <canvas id="progressChart" width="400" height="240"></canvas>
+        
+        <!-- 统计面板 -->
+        <div class="stats-panel">
+          <h2>訓練統計</h2>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value" id="totalClicks">0</div>
+              <span class="stat-label">總點擊次數</span>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="accuracy">0%</div>
+              <span class="stat-label">點擊準確率</span>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="avgReaction">0ms</div>
+              <span class="stat-label">平均反應時間</span>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="todayGames">0</div>
+              <span class="stat-label">今日遊戲次數</span>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   </div>
 
-  <audio id="clickSound" src="click.mp3" preload="auto"></audio>
-  <audio id="winSound" src="win.mp3" preload="auto"></audio>
-  <audio id="buttonSound" src="button.mp3" preload="auto"></audio>
+  <!-- 修改音频文件为本地文件 -->
+  <audio id="clickSound" preload="auto">
+    <source src="click.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="winSound" preload="auto">
+    <source src="win.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="buttonSound" preload="auto">
+    <source src="button.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="achievementSound" preload="auto">
+    <source src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" type="audio/mpeg">
+  </audio>
 
   <div id="credit">
     <div>Made by 表溜</div>
-    <div class="version">3.2 Ver.</div>
+    <div class="version">5.0 Ver.</div>
+    <!-- 添加Buy Me a Coffee按钮 -->
+    <a href="https://buymeacoffee.com/elwfk" target="_blank" class="coffee-btn">
+      <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
+    </a>
   </div>
 
   <script src="script.js"></script>
-  <footer class="site-footer">
-    <div class="footer-content">
-      <p>© 2025 我獨自成為槍男 - 反應力訓練</p>
-      <div class="footer-links">
-        <a href="#" class="footer-link">表溜嘎帥</a>
-        <span class="divider">|</span>
-        <a href="#" class="footer-link">表溜愛你</a>
-        <span class="divider">|</span>
-        <a href="#" class="footer-link">我要喝咖啡</a>
-      </div>
-    </div>
-  </footer>
 </body>
 </html>
