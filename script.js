@@ -17,12 +17,17 @@ let reactionTimes = [];
 // Achievements
 let achievements = {
   firstWin: { unlocked: false, title: "首勝", desc: "完成第一次遊戲", icon: "🏆", isNew: false },
-  speedDemon: { unlocked: false, title: "速度達人", desc: "在10秒內完成遊戲", icon: "⚡", isNew: false },
+  speedDemon: { unlocked: false, title: "速度達人", desc: "在15秒內完成遊戲", icon: "⚡", isNew: false },
+  godlikeSpeed: { unlocked: false, title: "超神速", desc: "在10秒內完成遊戲", icon: "🚀", isNew: false },
   hardMaster: { unlocked: false, title: "困難大師", desc: "在困難模式下完成遊戲", icon: "💀", isNew: false },
-  perfectAccuracy: { unlocked: false, title: "完美準確", desc: "達到100%點擊準確率", icon: "🎯", isNew: false },
-  fiveStreak: { unlocked: false, title: "五連勝", desc: "連續五次遊戲進步", icon: "🔥", isNew: false },
-  marathon: { unlocked: false, title: "馬拉松", desc: "完成50場遊戲", icon: "🏃", isNew: false }
+  perfectAccuracy: { unlocked: false, title: "完美準確", desc: "達到95%點擊準確率", icon: "🎯", isNew: false },
+  precisionShooter: { unlocked: false, title: "精準射手", desc: "連續3次遊戲達到95%以上準確率", icon: "🔫", isNew: false },
+  marathon: { unlocked: false, title: "馬拉松", desc: "完成50場遊戲", icon: "🏃", isNew: false },
+  ultimateMarathon: { unlocked: false, title: "持久戰士", desc: "完成100場遊戲", icon: "🦾", isNew: false },
+  extremeChallenge: { unlocked: false, title: "極限挑戰", desc: "在困難模式下完成7x7網格", icon: "🔥", isNew: false }
 };
+
+
 
 // Separate stats for normal and hard modes
 let normalBest = null;
@@ -152,7 +157,6 @@ const modeTabs = document.querySelectorAll(".mode-tab");
 const achievementBtn = document.getElementById("achievementBtn");
 const achievementModal = document.getElementById("achievementModal");
 const closeModalBtn = document.getElementById("closeModalBtn");
-const newAchievementBadge = document.getElementById("newAchievementBadge");
 
 // Chart variables
 let chart;
@@ -251,6 +255,8 @@ function playAchievementSound() {
     }
   }
 }
+
+
 
 // Create confetti effect
 function createConfetti() {
@@ -552,9 +558,17 @@ function checkAchievements(timeUsed) {
     unlockAchievement('hardMaster');
     unlockedAny = true;
   }
+
+ // 超神速成就
+if (!achievements.godlikeSpeed.unlocked && timeUsed < 10) {
+    achievements.godlikeSpeed.unlocked = true;
+    achievements.godlikeSpeed.isNew = true;
+    unlockAchievement('godlikeSpeed');
+    unlockedAny = true;
+  }
   
   // Perfect accuracy
-  if (!achievements.perfectAccuracy.unlocked && correctClicks === totalClicks && totalClicks > 0) {
+  if (!achievements.perfectAccuracy.unlocked && correctClicks / totalClicks >= 0.95 && totalClicks > 0) {
     achievements.perfectAccuracy.unlocked = true;
     achievements.perfectAccuracy.isNew = true;
     unlockAchievement('perfectAccuracy');
@@ -585,6 +599,30 @@ function checkAchievements(timeUsed) {
     unlockAchievement('marathon');
     unlockedAny = true;
   }
+
+// 精準射手成就
+  if (!achievements.precisionShooter.unlocked) {
+    // 檢查最近3次遊戲是否都達到95%準確率
+    // 需要實現遊戲記錄追蹤準確率
+  }
+
+// 持久戰士成就
+  if (!achievements.ultimateMarathon.unlocked && (normalTotalRuns + hardTotalRuns) >= 100) {
+    achievements.ultimateMarathon.unlocked = true;
+    achievements.ultimateMarathon.isNew = true;
+    unlockAchievement('ultimateMarathon');
+    unlockedAny = true;
+  }
+
+// 極限挑戰成就
+  if (!achievements.extremeChallenge.unlocked && isHardMode && gridSize === 7) {
+    achievements.extremeChallenge.unlocked = true;
+    achievements.extremeChallenge.isNew = true;
+    unlockAchievement('extremeChallenge');
+    unlockedAny = true;
+  }
+
+
   
   if (unlockedAny) {
     playAchievementSound();
@@ -593,22 +631,9 @@ function checkAchievements(timeUsed) {
   }
 }
 
-// Check if there are new achievements
-function checkForNewAchievements() {
-  let hasNew = false;
-  for (const key in achievements) {
-    if (achievements[key].isNew) {
-      hasNew = true;
-      break;
-    }
-  }
-  
-  if (hasNew) {
-    newAchievementBadge.style.display = "flex";
-  } else {
-    newAchievementBadge.style.display = "none";
-  }
-}
+
+
+
 
 // Unlock achievement with animation
 function unlockAchievement(achievementKey) {
@@ -621,6 +646,8 @@ function unlockAchievement(achievementKey) {
       <div class="achievement-title">${achievement.title}</div>
       <div class="achievement-desc">${achievement.desc}</div>
     </div>
+
+
   `;
   
   achievementsList.insertBefore(achievementEl, achievementsList.firstChild);
@@ -638,7 +665,6 @@ function unlockAchievement(achievementKey) {
 // Update achievements display
 function updateAchievements() {
   achievementsList.innerHTML = '';
-  
   for (const key in achievements) {
     const achievement = achievements[key];
     const achievementEl = document.createElement('div');
@@ -654,25 +680,24 @@ function updateAchievements() {
       </div>
     `;
     achievementsList.appendChild(achievementEl);
+
+    // 新成就才有動畫，動畫完馬上清掉 isNew
+    if (achievement.isNew) {
+      achievementEl.animate([
+        { transform: 'scale(1)', boxShadow: '0 0 0 rgba(76, 175, 80, 0)' },
+        { transform: 'scale(1.05)', boxShadow: '0 0 20px rgba(76, 175, 80, 0.7)' },
+        { transform: 'scale(1)', boxShadow: '0 0 0 rgba(76, 175, 80, 0)' }
+      ], {
+        duration: 1000,
+        iterations: 2
+      });
+      setTimeout(() => {
+        achievementEl.classList.remove('new');
+        achievement.isNew = false;
+        saveStats();
+      }, 2000);
+    }
   }
-  
-  // Add animations for new achievements
-  const newAchievements = document.querySelectorAll('.achievement.new');
-  newAchievements.forEach(el => {
-    el.animate([
-      { transform: 'scale(1)', boxShadow: '0 0 0 rgba(76, 175, 80, 0)' },
-      { transform: 'scale(1.05)', boxShadow: '0 0 20px rgba(76, 175, 80, 0.7)' },
-      { transform: 'scale(1)', boxShadow: '0 0 0 rgba(76, 175, 80, 0)' }
-    ], {
-      duration: 1000,
-      iterations: 2
-    });
-    
-    // Remove new class after animation
-    setTimeout(() => {
-      el.classList.remove('new');
-    }, 2000);
-  });
 }
 
 // Toggle achievement modal
@@ -1081,17 +1106,7 @@ modeTabs.forEach(tab => {
   });
 });
 
-// Achievement modal functionality
-achievementBtn.addEventListener('click', toggleAchievementModal);
 
-closeModalBtn.addEventListener('click', toggleAchievementModal);
-
-// Close modal when clicking outside
-achievementModal.addEventListener('click', function(e) {
-  if (e.target === this) {
-    toggleAchievementModal();
-  }
-});
 
 // Initialize
 

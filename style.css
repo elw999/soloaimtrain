@@ -574,6 +574,7 @@ h2 {
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   text-align: right;
   border: 1px solid rgba(255, 255, 255, 0.2);
+
   /* 新增样式：居中内容 */
   display: flex;
   flex-direction: column;
@@ -999,29 +1000,7 @@ h2 {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.new-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #ff5252;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: pulse 1.5s infinite;
-  display: none; /* 默認隱藏 */
-}
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
 
 /* 成就彈窗 */
 .achievement-modal {
@@ -2920,4 +2899,185 @@ h2 {
   50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+}
+
+/* Creator credit with sponsor arrow */
+.creator-container {
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.creator-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  text-align: right;
+}
+
+.sponsor-arrow {
+  position: absolute;
+  top: 50%;
+  left: -100px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  z-index: 1002; /* 提高z-index確保在最上層 */
+  pointer-events: none; /* 防止點擊干擾 */
+}
+
+.sponsor-text {
+  font-size: 14px;
+  color: white;
+  margin-right: 5px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.arrow-svg {
+  width: 80px;
+  height: 30px;
+}
+
+#credit:hover .sponsor-arrow {
+  opacity: 1;
+  transform: translateY(-50%) translateX(5px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sponsor-arrow {
+    left: -80px;
+  }
+  
+  .arrow-svg {
+    width: 60px;
+  }
+  
+  .sponsor-text {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sponsor-arrow {
+    display: none; /* Hide on very small screens */
+  }
+}
+
+/* 音量滑動條美化 */
+#volumeSlider {
+  -webkit-appearance: none;
+  width: 100px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  outline: none;
+  opacity: 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+#soundControls:hover #volumeSlider {
+  opacity: 1;
+}
+
+/* 滑動條軌道 */
+#volumeSlider::-webkit-slider-runnable-track {
+  height: 6px;
+  background: linear-gradient(90deg, rgba(58,123,213,0.8), rgba(0,210,255,0.8));
+  border-radius: 3px;
+}
+
+/* 滑動條拇指 */
+#volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  margin-top: -6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+  border: 2px solid var(--secondary-color);
+}
+
+#volumeSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: var(--secondary-color);
+  box-shadow: 0 0 10px rgba(0,210,255,0.5);
+}
+
+/* Firefox 兼容樣式 */
+#volumeSlider::-moz-range-track {
+  height: 6px;
+  background: linear-gradient(90deg, rgba(58,123,213,0.8), rgba(0,210,255,0.8));
+  border-radius: 3px;
+}
+
+#volumeSlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+  border: 2px solid var(--secondary-color);
+}
+
+#volumeSlider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  background: var(--secondary-color);
+  box-shadow: 0 0 10px rgba(0,210,255,0.5);
+}
+
+.achievement-btn {
+  position: relative;
+}
+.new-badge {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  background: #ffd700;
+  color: #b10000;
+  font-weight: bold;
+  font-size: 1.1em;
+  border-radius: 50%;
+  padding: 2px 7px 2px 7px;
+  display: none;
+  pointer-events: none;
+  box-shadow: 0 2px 8px #ffd70088;
+  animation: badge-pop 0.5s;
+}
+@keyframes badge-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  80% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.lang-btn, .achievement-btn {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 15px;
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 40px;
+  min-width: 90px;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.lang-btn:hover, .achievement-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

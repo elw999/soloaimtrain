@@ -5,37 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>我獨自成為槍男| 舒爾特方塊</title>
   <link rel="stylesheet" href="style.css">
+  <!-- 引入成就面板獨立 CSS -->
+  <link rel="stylesheet" href="achievement-panel.css">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  
   <style>
     /* 修复网格大小选项颜色问题 */
     #gridSize option {
       background-color: rgba(0, 0, 0, 0.8);
       color: white;
     }
-    
-    /* 修复成就面板高度问题 */
-    .achievements-panel {
-      max-height: none;
-      overflow: visible;
-    }
-    
-    <!-- 修改 #startPrompt 部分 -->
-<div id="startPrompt">
-  <div class="click-hint">
-    <div class="mouse-icon">
-      <div class="mouse-wheel"></div>
-    </div>
-    <div class="click-text">點擊空白處開始</div>
-  </div>
-</div>
-    
-    #gameArea:not(.game-started) #startPrompt {
-      opacity: 1;
-    }
-    
     /* 顶部控制按钮布局修复 */
     .top-controls {
       display: flex;
@@ -45,14 +25,12 @@
       left: 20px;
       z-index: 1001;
     }
-    
     @media (max-width: 480px) {
       .top-controls {
         gap: 10px;
         top: 10px;
         left: 10px;
       }
-      
       .achievement-btn .achievement-text {
         display: none;
       }
@@ -62,8 +40,8 @@
 <body>
   <!-- 粒子背景容器 -->
   <div id="particles-js"></div>
-  
-  <!-- 顶部控制按钮容器 -->
+
+  <!-- 頂部控制按鈕容器 -->
   <div class="top-controls">
     <div id="languageSwitcher">
       <button id="switchLanguageBtn" class="lang-btn">
@@ -71,7 +49,6 @@
         <span class="lang-text">EN</span>
       </button>
     </div>
-
     <button id="achievementBtn" class="achievement-btn">
       <span class="achievement-icon">🏆</span>
       <span class="achievement-text">成就</span>
@@ -88,6 +65,9 @@
   </div>
 
   <div id="mainContainer">
+
+
+
     <div class="game-center-container">
       <section id="playerStats">
         <h2>玩家數據</h2>
@@ -95,7 +75,6 @@
           <button class="mode-tab active" data-mode="normal">普通模式</button>
           <button class="mode-tab" data-mode="hard">困難模式</button>
         </div>
-        
         <div id="normalStats" class="stats-container active">
           <div class="stat-item">
             <span class="stat-label">總完成場數:</span>
@@ -110,7 +89,6 @@
             <span id="normalBestTime" class="stat-value">尚無紀錄</span>
           </div>
         </div>
-        
         <div id="hardStats" class="stats-container">
           <div class="stat-item">
             <span class="stat-label">總完成場數:</span>
@@ -125,48 +103,23 @@
             <span id="hardBestTime" class="stat-value">尚無紀錄</span>
           </div>
         </div>
-        
         <button id="resetStatsBtn" class="reset-btn">重置數據</button>
-
-       <!-- 成就模態框 -->
-<div id="achievementModal" class="achievement-modal">
-  <div class="modal-overlay"></div>
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>成就系統</h2>
-      <button id="closeModalBtn" class="close-btn">&times;</button>
-    </div>
-    <div id="achievementsList" class="achievements-container">
-      <!-- 成就会动态添加 -->
-    </div>
-  </div>
-</div>
-        
-        <!-- 设置面板 -->
-<div class="settings-panel">
-  <div class="settings-header">
-    <div class="settings-title">遊戲設置</div>
-  </div>
-  <div class="settings-group">
-    <label class="settings-label">網格大小:</label>
-    <select id="gridSize" class="settings-input">
-      <option value="5">5x5 (25個數字)</option>
-      <option value="6">6x6 (36個數字)</option>
-      <option value="7">7x7 (49個數字)</option>
-    </select>
-  </div>
-  <button id="applySettingsBtn" class="reset-btn">應用設置</button>
-</div>
-        
-        <!-- 成就面板 -->
-        <div class="achievements-panel">
-          <h2></h2>
-          <div id="achievementsList">
-            <!-- 成就会动态添加 -->
+        <!-- 設定面板 -->
+        <div class="settings-panel">
+          <div class="settings-header">
+            <div class="settings-title">遊戲設置</div>
           </div>
+          <div class="settings-group">
+            <label class="settings-label">網格大小:</label>
+            <select id="gridSize" class="settings-input">
+              <option value="5">5x5 (25個數字)</option>
+              <option value="6">6x6 (36個數字)</option>
+              <option value="7">7x7 (49個數字)</option>
+            </select>
+          </div>
+          <button id="applySettingsBtn" class="reset-btn">應用設置</button>
         </div>
       </section>
-      
       <section id="gameArea">
         <button id="hardModeToggleBtn" title="切換困難模式" aria-label="切換困難模式" class="mode-btn">
           <span class="mode-icon">😊</span>
@@ -180,15 +133,20 @@
         <div id="grid-container">
           <div id="grid"></div>
         </div>
-        <div id="startPrompt">點擊空白處開始遊戲</div>
+        <div id="startPrompt">
+          <div class="click-hint">
+            <div class="mouse-icon">
+              <div class="mouse-wheel"></div>
+            </div>
+            <div class="click-text">點擊空白處開始</div>
+          </div>
+        </div>
         <button id="restartBtn">再玩一次</button>
       </section>
-      
       <section id="progressArea">
         <h2>進步幅度 <span class="subtext">（近10次紀錄）</span></h2>
         <div id="progressNumber">尚無資料</div>
         <canvas id="progressChart" width="400" height="240"></canvas>
-        
         <!-- 统计面板 -->
         <div class="stats-panel">
           <h2>訓練統計</h2>
@@ -215,7 +173,30 @@
     </div>
   </div>
 
-  <!-- 修改音频文件为本地文件 -->
+  <!-- 成就面板，請勿放在#playerStats內，直接放在body底部 -->
+  <!-- achievement-panel.html 內容如下 -->
+  <div id="achievementModal" class="achievement-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🏆 成就系統 Achievements</h2>
+        <button id="closeModalBtn" class="close-btn" aria-label="關閉">&times;</button>
+      </div>
+      <div class="achievements-hero">
+        <div class="hero-trophy">🏅</div>
+        <div class="hero-text">
+          解鎖並收集所有成就吧！
+          <br>
+          <span class="hero-subtext">Complete tasks to collect every badge!</span>
+        </div>
+      </div>
+      <div id="achievementsList" class="achievements-container">
+        <!-- 成就會由 script.js 動態生成 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 音效 -->
   <audio id="clickSound" preload="auto">
     <source src="click.mp3" type="audio/mpeg">
   </audio>
@@ -232,12 +213,11 @@
   <div id="credit">
     <div>Made by 表溜</div>
     <div class="version">5.0 Ver.</div>
-    <!-- 添加Buy Me a Coffee按钮 -->
     <a href="https://buymeacoffee.com/elwfk" target="_blank" class="coffee-btn">
       <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee">
     </a>
   </div>
-
   <script src="script.js"></script>
+<script src="achievement-panel.js"></script>
 </body>
 </html>
